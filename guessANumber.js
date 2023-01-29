@@ -34,17 +34,10 @@ function start() {
             console.log("OK! Lets GO!");
             top = 100;
             bottom = 0;
-            if (firstTime) {
-                firstTime = false;
-                chooseGameType();
-            }
 
-            if (playAgain) {
-                console.log(`${playedGames} ${playedGames > 1 ? "Games" : "Game"} Played \nYour Scores: ${playerScores} \nMy Scores: ${peterScores}`);
-                console.log("------------------------------");
-            }
             petersNum = Math.floor(Math.random() * 100);
-            setDifficulty();
+            firstTime = false;
+            chooseGameType();
 
         } else if (agree === "n" || agree === "no") {
             console.log("------------------------------");
@@ -69,11 +62,17 @@ function chooseGameType() {
 
         if (playerChoise === "s" || playerChoise === "snake") {
             console.log("------------------------------");
-            console.log("OK! Lets GO!");
-            peterGuessTheNum();
+            console.log("Prepare to be amazed");
+            playedGames++
+            ready();
         } else if (playerChoise === "p" || playerChoise === "player") {
             console.log("------------------------------");
-            console.log("OK! Lets GO!");
+            console.log("I do hope to give you the slipperiest of challenges, my friend!");
+            if (playAgain) {
+                console.log(`${playedGames} ${playedGames > 1 ? "Games" : "Game"} Played \nYour Scores: ${playerScores} \nMy Scores: ${peterScores}`);
+                console.log("------------------------------");
+            }
+            playedGames++
             setDifficulty();
         } else {
             console.log("------------------------------");
@@ -136,7 +135,6 @@ function playerGuessTheNum() {
 
             if (guess <= top && guess >= bottom) {
                 if (guess === petersNum) {
-                    playedGames++;
                     playerScores += playerWinScores;
                     playAgain = true;
                     console.log("You guess it!");
@@ -144,12 +142,12 @@ function playerGuessTheNum() {
                     start();
                 } else if (guess > petersNum) {
                     console.log("Too High!");
-                    top = guess
+                    top = guess;
                     shots--;
                     playerGuessTheNum();
                 } else if (guess < petersNum) {
                     console.log("Too Low!");
-                    bottom = guess
+                    bottom = guess;
                     shots--;
                     playerGuessTheNum();
                 }
@@ -159,7 +157,6 @@ function playerGuessTheNum() {
             }
         });
     } else {
-        playedGames++;
         peterScores += peterWinScores;
         playAgain = true;
         console.log("------------------------------");
@@ -171,13 +168,91 @@ function playerGuessTheNum() {
 }
 
 function peterGuessTheNum() {
-// console "did you think of a number"?
-// if yes
-// logic "is it 50"? To cut the odds in half and then randomize the remaining numbers.
-// if not
-// "Think of a number and press R when you're ready."
 
-    console.log(`Coming Soon`);
-    console.log(`Wanna play "Player guess a number"?`);
-    start();
+    readline.question("Too [H]igh / Too [L]ow / [Y]es you [G]uess it ", str => {
+        let directions = str.toLowerCase();
+
+        if (directions === "too high" || directions === "high" || directions === "h") {
+            top = guess;
+            if (top - bottom <= 1) {
+                console.log(`There Is No Such Number!`);
+                console.log("------------------------------");
+                console.log("Wanna play again?");
+                start();
+            }
+            if (top - bottom !== 2) {
+                guess = Math.floor(Math.random() * (top - bottom - 1)) + bottom + 1;
+                console.log("------------------------------");
+                console.log(`So your number lies within the range of ${bottom !== -1 ? bottom: 0} and ${top !== 101 ? top : 100}!`);
+                console.log(`Is it ${guess}`);
+                console.log("------------------------------");
+                peterGuessTheNum();
+            } else {
+                console.log("------------------------------");
+                console.log(`Your number is ${top - 1}.`);
+                console.log("------------------------------");
+                console.log("Wanna play again?");
+                start();
+            }
+        } else if (directions === "too low" || directions === "low" || directions === "l") {
+            bottom = guess;
+            if (top - bottom <= 1) {
+                console.log(`There Is No Such Number!`);
+                console.log("------------------------------");
+                console.log("Wanna play again?");
+                playAgain = false;
+                start();
+
+            }
+            if (top - bottom !== 2) {
+                guess = Math.floor(Math.random() * (top - bottom - 1)) + bottom + 1;
+                console.log("------------------------------");
+                console.log(`So your number lies within the range of ${bottom !== -1 ? bottom: 0} and ${top !== 101 ? top : 100}!`);
+                console.log(`Is it ${guess}`);
+                console.log("------------------------------");
+                peterGuessTheNum();
+            } else {
+                console.log("------------------------------");
+                console.log(`Your number is ${top - 1}.`);
+                console.log("------------------------------");
+                console.log("Wanna play again?");
+                playAgain = false;
+
+                start();
+            }
+
+        } else if (directions === "you guess it" || directions === "guess" || directions === "g" || directions === "y" || directions === "yes") {
+            console.log("------------------------------");
+            console.log("Wanna play again?");
+            start();
+
+        } else {
+            console.log("------------------------------");
+            console.log(`Invalid input! Try again! Is your number ${guess}?`);
+            peterGuessTheNum();
+        }
+    });
+}
+
+function ready() {
+    console.log(`This game is for fun. I bet I can guess your number in less than 10 tries, \nbut I don't want to get points for it.`);
+    readline.question(`Thing of a number an press [R]eady: `, str => {
+        let agree = str.toLowerCase();
+
+        if (agree === "r" || agree === "ready") {
+            console.log("------------------------------");
+            console.log(`Is it 50`);
+            console.log("------------------------------");
+
+            top = 101;
+            bottom = -1;
+            guess = 50;
+            peterGuessTheNum();
+
+        } else {
+            console.log("------------------------------");
+            console.log("Invalid input! Try again");
+            ready();
+        }
+    });
 }
